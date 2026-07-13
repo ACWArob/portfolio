@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
+import AutoGrasp from './AutoGrasp'
 
 const RESUME = 'Adam_Abid_Master.pdf'
 const WORDS = ['Applied ML', 'Robotics', 'Software', 'Customer-Focused']
@@ -89,7 +90,7 @@ function JourneyTimeline() {
   )
 }
 
-export default function App() {
+function Home() {
   const [ri, setRi] = useState(0)
   const [imgOk, setImgOk] = useState(false)
   const reduce = useRef(false)
@@ -277,11 +278,14 @@ export default function App() {
         <div className="wrap">
           <div className="shead"><span className="num">04</span><h2>Projects &amp; Research</h2></div>
           <div className="xgrid">
-            <div className="xcard">
+            <a className="xcard xcard-link feature" href="#/projects/autograsp">
+              <div className="feat-tag">Flagship · Case study</div>
               <div className="top"><div><h3>AutoGrasp</h3><div className="role">Robotics Research</div></div><div className="when">2026 · in progress</div></div>
-              <p>Language-conditioned grasping on a Unitree H1-2 humanoid + MAGPIE gripper: a ROS control stack plus Pi-0 / Zero-0.5 VLA models. Workshop paper in progress.</p>
-              <div className="chips"><span>PyTorch</span><span>ROS</span><span>MuJoCo</span><span>VLA</span></div>
-            </div>
+              <p>Teaching a robot to teach itself: a ROS2 stack, a self-grading data engine, and the honest failure that led to a <b>97/100</b> grasp policy with zero human labels.</p>
+              <div className="metrics"><Metric v="97" label="/100 picks" /><Metric v="0" label="human labels" /><Metric v="66.7" label="episodes/hr" /></div>
+              <div className="chips"><span>ROS2</span><span>SAM3</span><span>ACT</span><span>LeRobot</span><span>GraspGenX</span></div>
+              <div className="cs-read">Read the case study →</div>
+            </a>
             <div className="xcard">
               <div className="top"><div><h3>Nara Vision</h3><div className="role">Computer-Vision Web App</div></div><div className="when">2020–21</div></div>
               <p>A web app on Google Cloud Vision with five features: landmark recognition, logo detection, OCR, facial-emotion, and species/label classification, validated across 100+ images and demoed at the Synopsys Science Fair.</p>
@@ -371,4 +375,15 @@ export default function App() {
       </footer>
     </>
   )
+}
+
+export default function App() {
+  const [route, setRoute] = useState(() => window.location.hash)
+  useEffect(() => {
+    const onHash = () => setRoute(window.location.hash)
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+  if (route.startsWith('#/projects/autograsp')) return <AutoGrasp />
+  return <Home />
 }
