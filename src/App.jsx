@@ -300,7 +300,7 @@ function Home() {
               <div className="chips"><span>JavaScript</span><span>Google Cloud Vision</span><span>OCR</span><span>HTML/CSS</span></div>
             </div>
             <div className="xcard">
-              <div className="top"><div><h3>Clinic Scheduling System</h3><div className="role">Full-Stack App · Dubai</div></div><div className="when">2024</div></div>
+              <div className="top"><div><h3>Clinic Scheduling System</h3><div className="role">Full-Stack App · San Mateo, CA</div></div><div className="when">2024</div></div>
               <p>A physician-clinic platform that cut double-bookings 90% with automated rescheduling, notifications, and calendar sync, built with Django REST + AJAX + Google OAuth and maintained via monthly Scrum sprints.</p>
               <div className="chips"><span>Django REST</span><span>AJAX</span><span>Google OAuth</span><span>Scrum</span></div>
             </div>
