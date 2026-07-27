@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import AutoGrasp from './AutoGrasp'
+import HamsSimulation from './HamsSimulation'
 
 const RESUME = 'Adam_Abid_Master.pdf'
 const WORDS = ['Applied ML', 'Robotics', 'Software', 'Customer-Focused']
@@ -286,12 +287,12 @@ function Home() {
               <div className="chips"><span>ROS2</span><span>SAM3</span><span>ACT</span><span>LeRobot</span><span>GraspGenX</span></div>
               <div className="cs-read">Read the case study →</div>
             </a>
-            <a className="xcard xcard-link feature" href="https://github.com/correlllab/HAMS/tree/grasp-2method-comparison" target="_blank" rel="noreferrer">
+            <a className="xcard xcard-link feature" href="#/projects/hams-simulation">
               <div className="feat-tag">Robotics Research · Simulation</div>
-              <div className="top"><div><h3>HAMS · Humanoid Sim Stack</h3><div className="role">Correll Lab · humanoid paper</div></div><div className="when">2026 · in progress</div></div>
-              <p>My simulation work for a humanoid manipulation paper on the Correll Lab H1. I work inside the sim stack (MuJoCo / RoboCasa and Isaac Sim over ROS2), run head-to-head comparisons of grasp-planning methods, and debug the hard real-time issues (DDS sensor drops, controller stability) that make a humanoid stand, grasp, and navigate reliably in sim.</p>
+              <div className="top"><div><h3>HAMS Simulation</h3><div className="role">Correll Lab · humanoid paper</div></div><div className="when">2026 · in progress</div></div>
+              <p>My simulation work on the Correll Lab H1 humanoid: getting the stack to run on a laptop (CPU-only), a head-to-head comparison of grasp-planning methods, and the real-time debugging (DDS sensor drops, controller stability) that makes a humanoid grasp reliably in sim.</p>
               <div className="chips"><span>MuJoCo</span><span>RoboCasa</span><span>Isaac Sim</span><span>ROS2</span><span>Grasp comparison</span></div>
-              <div className="cs-read">View the code →</div>
+              <div className="cs-read">Read the case study →</div>
             </a>
             <div className="xcard">
               <div className="top"><div><h3>Nara Vision</h3><div className="role">Computer-Vision Web App</div></div><div className="when">2020–21</div></div>
@@ -392,5 +393,6 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
   if (route.startsWith('#/projects/autograsp')) return <AutoGrasp />
+  if (route.startsWith('#/projects/hams-simulation')) return <HamsSimulation />
   return <Home />
 }
