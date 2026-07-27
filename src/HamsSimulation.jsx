@@ -1,13 +1,14 @@
 import { useEffect } from 'react'
 
+const B = 'https://raw.githubusercontent.com/correlllab/HAMS/b7574bb/portfolio_assets/'
 const REPO = 'https://github.com/correlllab/HAMS/tree/grasp-2method-comparison'
 
 const STATS = [
-  ['H1', 'humanoid platform'],
-  ['2', 'grasp methods compared'],
-  ['MuJoCo + Isaac', 'simulators bridged'],
+  ['4', 'grasp methods compared'],
+  ['3', 'base conditions'],
+  ['world-anchored', 'executor fix'],
   ['CPU-only', 'Apple-Silicon port'],
-  ['ROS2', 'real-time control'],
+  ['H1', 'humanoid platform'],
 ]
 
 const ArchDiagram = () => (
@@ -15,7 +16,7 @@ const ArchDiagram = () => (
     <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="HAMS simulation architecture">
       <defs>
         <style>{`
-          .box{fill:#12332E;stroke:#2E8B7F;stroke-width:2;rx:12}
+          .box{fill:#12332E;stroke:#2E8B7F;stroke-width:2}
           .lbl{fill:#EAF2EF;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px}
           .sub{fill:#9FB8B1;font-family:'JetBrains Mono',monospace;font-size:11px}
           .bus{fill:#2E8B7F}
@@ -38,38 +39,57 @@ const ArchDiagram = () => (
       <text className="sub" x="610" y="102" text-anchor="middle">IK · grasp · safety</text>
       <rect className="bus" x="120" y="150" width="520" height="46" rx="12" />
       <text className="buslbl" x="380" y="178" text-anchor="middle">CycloneDDS · one shared ROS domain</text>
-      <rect x="300" y="228" width="160" height="48" rx="12" fill="#0F1211" stroke="#5FBFB0" stroke-width="2" />
+      <rect x="300" y="228" width="160" height="48" rx="12" fill="#0F1211" stroke="#5FBFB0" strokeWidth="2" />
       <text className="lbl" x="380" y="257" text-anchor="middle">Unitree H1</text>
     </svg>
-    <figcaption>Three components (two simulators plus the ROS2 control stack) share one CycloneDDS domain and drive the same H1.</figcaption>
+    <figcaption>Two simulators plus the ROS2 control stack share one CycloneDDS domain and drive the same H1.</figcaption>
   </figure>
 )
+
+const Fig = ({ src, cap }) => {
+  const hide = (e) => { const f = e.currentTarget.closest('.cs-fig'); if (f) f.style.display = 'none' }
+  return (
+    <figure className="cs-fig">
+      <img src={B + src} alt={cap} loading="lazy" onError={hide} />
+      <figcaption>{cap}</figcaption>
+    </figure>
+  )
+}
 
 const CHAPTERS = [
   {
     n: '01', tag: 'Where I fit in', title: 'The sim side of a humanoid stack',
-    body: "HAMS (Humanoid Agent Modular Stack) is the Correll Lab's platform for the Unitree H1: MuJoCo/RoboCasa and Isaac Sim bridged to a ROS2 control stack over one shared CycloneDDS domain. It is a team project. My part was the simulation side, getting the humanoid to run reliably in sim, comparing how it decides where to grasp, and hunting the bugs that only appear in real time.",
+    body: "HAMS (Humanoid Agent Modular Stack) is the Correll Lab's platform for the Unitree H1: MuJoCo/RoboCasa and Isaac Sim bridged to a ROS2 control stack over one shared CycloneDDS domain. It is a team project. My part was the simulation experiments: comparing how the robot decides where to grasp, and figuring out why a standing humanoid keeps dropping grasps that a bolted-down arm would make easily.",
     learn: 'Know exactly which part of a big system is yours, and own it end to end.',
     svg: true,
   },
   {
     n: '02', tag: 'Running anywhere', title: 'Getting the humanoid off the GPU cluster',
-    body: "The full stack assumed an NVIDIA workstation. I worked on a self-contained Apple-Silicon, CPU-only path so the humanoid sim runs on a laptop: MuJoCo rendering in software, ROS2 on FastDDS for arm64, and both the MuJoCo viewer and RViz streamed to a browser over noVNC. That turned 'you need the lab machine' into 'clone and run,' which meant I (and anyone else) could iterate on the sim without booking the cluster.",
+    body: "The full stack assumed an NVIDIA workstation. I worked on a self-contained Apple-Silicon, CPU-only path so the humanoid sim runs on a laptop: MuJoCo rendering in software, ROS2 on FastDDS for arm64, and both the MuJoCo viewer and RViz streamed to a browser over noVNC. That turned 'you need the lab machine' into 'clone and run,' so I could iterate on experiments without booking the cluster.",
     learn: 'Lowering the cost to run something is a force multiplier for everyone on the project.',
+    figs: [{ src: 'grasp_headcam.jpg', cap: "Head-camera view: the H1 reaching for a fridge handle in the RoboCasa kitchen, running in the CPU-only sim." }],
   },
   {
-    n: '03', tag: 'Comparing grasps', title: 'Two ways to decide where to grab',
-    body: "The core of my contribution was a head-to-head grasp-method comparison in sim. I put a geometric approach (PCA on the object's point cloud) against a learned cross-embodiment model (GraspGenX) under one protocol: same objects, same poses, same scoring. Holding everything constant except the planner is what makes the result mean something, rather than comparing two setups that happen to differ everywhere.",
-    learn: 'A fair comparison needs one protocol. Hold everything constant except the thing you are testing.',
+    n: '03', tag: 'Comparing grasps', title: 'Which planner should decide the grasp?',
+    body: "I put four grasp-planning methods head to head under one protocol: a centroid heuristic, PCA top-down, NVIDIA's GraspGenX, and a ranked-skill method. Same objects and scoring, but crossed with three base conditions: frozen (bolted down), hanging (tethered), and standing free. The geometric methods did fine with a frozen base and fell apart once the robot stood on its own; the ranked skill stayed the most robust across all three.",
+    learn: 'A fair comparison needs one protocol. Here the base condition mattered as much as the planner itself.',
+    figs: [{ src: 'fig1_three_tier.png', cap: 'Grasp success by method and base condition (frozen, hanging, standing), with Wilson 95% confidence intervals.' }],
   },
   {
-    n: '04', tag: 'Debugging real time', title: 'The bugs that only appear when the clock is running',
-    body: "Most of the work was making it reliable. I traced dropped sensor data down to kernel UDP buffers and a single-core network interrupt (the robot's 500 Hz state stream was arriving at ~400 Hz with multi-second stalls). I chased a motor watchdog that dropped the H1 under a slow sim clock, and a pre-grasp motion-planning path that kept failing, which I routed around with direct servo control. None of these are logic bugs; they only show up once everything is running together in real time.",
-    learn: 'In robotics, the interesting bugs live in timing, not logic.',
+    n: '04', tag: 'Debugging real time', title: 'Why a standing robot drops the grasp',
+    body: "A standing humanoid sways, and the old executor planned the reach in the pelvis frame, so every wobble dragged the target off the object. On the standing tier most methods scored 0 out of 20. I re-anchored execution to the world frame, and success came back across the board (centroid jumped from 0 to 24 out of 30). The bug was never the grasp planner. It was the moving reference frame.",
+    learn: 'In robotics the interesting bugs live in the reference frame and the clock, not the logic.',
+    figs: [{ src: 'fig2_executor_ablation.png', cap: 'Standing-tier ablation: the old pelvis-frame executor (grey) vs my world-anchored executor (green).' }],
   },
   {
-    n: '05', tag: 'What it enables', title: 'Test in sim, then trust the robot',
-    body: "A humanoid sim that runs anywhere and behaves like the real robot means grasps and policies can be tried, compared, and debugged before they ever touch hardware. That is the point of the sim work: a fast, safe loop that feeds a humanoid manipulation paper in progress.",
+    n: '05', tag: 'Measuring the wobble', title: 'Proving it with posturography',
+    body: "To show the effect was real and not luck, I ran a posturography battery on the standing tier: mean sway velocity, medial-lateral RMS, 95% sway-ellipse area, and minimum margin-of-stability, measured per grasp method and tagged by outcome (success, unstable, wander, fall). It turns 'this one feels more stable' into numbers, and it shows exactly which methods disturb balance enough to tip the robot over.",
+    learn: 'If balance is the hidden variable, measure it directly instead of arguing about it.',
+    figs: [{ src: 'fig7_sway_rainclouds.png', cap: 'Posturography battery: base-disturbance metrics per grasp method, coloured by outcome.' }],
+  },
+  {
+    n: '06', tag: 'What it enables', title: 'Test in sim, then trust the robot',
+    body: "A humanoid sim that runs anywhere and behaves like the real robot means grasps and controllers can be compared, debugged, and measured before they ever touch hardware. That is the point of the work: a fast, safe loop, and evidence (not vibes) for which method to put on the real H1. It feeds a humanoid manipulation paper in progress.",
     learn: 'Good simulation is not a demo, it is the fastest and safest way to iterate.',
   },
 ]
@@ -93,7 +113,7 @@ export default function HamsSimulation() {
         <div className="cs-wrap">
           <div className="kicker">Robotics Research · Correll Lab · 2026</div>
           <h1 className="cs-title">Proving a Humanoid in Simulation</h1>
-          <p className="cs-sub">My work on HAMS, the Correll Lab's humanoid stack: getting the H1 to run in sim anywhere, comparing grasp-planning methods head to head, and debugging the real-time issues that make it reliable.</p>
+          <p className="cs-sub">My work on HAMS, the Correll Lab's humanoid stack: comparing grasp-planning methods on the H1, and tracking down why a standing robot drops grasps that a bolted-down arm makes easily.</p>
           <div className="cs-stats">
             {STATS.map(([v, l]) => (
               <div key={l} className="cs-stat"><b>{v}</b><span>{l}</span></div>
@@ -111,6 +131,9 @@ export default function HamsSimulation() {
             <h2 className="cs-ch-title">{c.title}</h2>
             <p className="cs-ch-body">{c.body}</p>
             {c.svg && <div className="cs-figs"><ArchDiagram /></div>}
+            {c.figs && c.figs.length > 0 && (
+              <div className="cs-figs">{c.figs.map(f => <Fig key={f.src} src={f.src} cap={f.cap} />)}</div>
+            )}
             <p className="cs-learn"><span>What I learned</span>{c.learn}</p>
           </article>
         ))}
