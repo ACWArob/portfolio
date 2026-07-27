@@ -53,9 +53,9 @@ const CHAPTERS = [
   {
     n: '06', date: 'July 2026', tag: 'The extra testing',
     title: 'Where it works, and where it stops',
-    body: "97/100 is only honest if you also say where it breaks. So I tested the edge: I moved the block one grid step (3 cm) past the trained zone, into never-seen territory. Inside the grid the policy holds 97%. One step outside, it collapses to 8/96. The policy interpolates cleanly within its data and does not extrapolate. That is not a bug to hide, it is the boundary of the data, measured, and it tells you exactly where the next episodes need to go.",
+    body: "97/100 is only honest if you also say where it breaks. So I tested the edge: I moved the block one grid step (3 cm) past the trained zone, into never-seen territory. Inside the grid the policy holds 97%. One step outside, its success collapses into the single digits. The policy interpolates cleanly within its data and does not extrapolate. That is not a bug to hide, it is the boundary of the data, measured, and it tells you exactly where the next episodes need to go.",
     learn: 'A great in-distribution number can hide a hard edge. Find the cliff on purpose.',
-    figs: [{ src: 'v1_ood_ring_heatmap.png', cap: 'The trained zone (97%) and the ring one step outside it (8%): a hard extrapolation cliff.' }],
+    figs: [{ src: 'v1_ood_ring_heatmap.png', cap: 'The ring one grid step outside the trained zone: a hard extrapolation cliff.' }],
   },
   {
     n: '07', date: 'Ongoing', tag: 'Everything is measured',
