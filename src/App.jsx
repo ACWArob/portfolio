@@ -66,7 +66,7 @@ const MS = [
   { year: '2024', place: 'Bay Area', title: 'Clinic Platform', img: 'clinic', city: 'bay', desc: 'Shipped a full-stack scheduling app that cut double-bookings 90% (Django REST, AJAX, Google OAuth).' },
   { year: '2025', place: 'Boulder', title: 'CU Boulder + Research', img: 'cuboulder', city: 'boulder', desc: 'Started CS + Statistics (graduating May 2028) and joined the $1.8M ARPA-E Correll lab and CU Quants.' },
   { year: '2026', place: 'Boulder', title: 'NSBE Torch Chair', img: 'nsbe', city: 'boulder', desc: "Torch Chair for CU Boulder's National Society of Black Engineers chapter, growing the community and pipeline for the next generation of engineers." },
-  { year: '2026', place: 'Boulder', title: 'AutoGrasp (Workshop Paper)', img: 'autograsp', city: 'boulder', desc: 'Teaching a Unitree H1-2 humanoid to grasp on command. Paper in progress.' },
+  { year: '2026', place: 'Boulder', title: 'AutoGrasp + Humanoid Sim', img: 'autograsp', city: 'boulder', desc: 'A UR5e that collects and grades its own grasp data, reaching a 97/100 policy with zero human labels, plus humanoid simulation work (HAMS). Papers in progress.' },
   { year: '2027', place: 'Next', title: 'The dream internship', img: 'goal', city: 'boulder', desc: 'To be determined 👀' },
 ]
 
@@ -244,9 +244,9 @@ function Home() {
             <div className="xcard">
               <Img src="./images/correll.jpg" alt="Correll Lab" hint="images/correll.jpg" className="xcard-img" />
               <div className="top"><div><h3>Correll Lab · CU Robotics</h3><div className="role">Research Assistant</div></div><div className="when">2025–now</div></div>
-              <p>Teaching a Unitree H1-2 humanoid with a MAGPIE gripper to grasp on command. Building <b>AutoGrasp</b>, its ROS control stack, and prototyping Pi-0 / Zero-0.5 vision-language-action models. Workshop paper in progress.</p>
-              <div className="metrics"><Metric v="1.8" pre="$" suf="M" label="ARPA-E grant" /><div><b>VLA</b><small>language→action</small></div></div>
-              <div className="chips"><span>PyTorch</span><span>ROS</span><span>MuJoCo</span><span>VLA models</span><span>MAGPIE</span></div>
+              <p>Two robotics projects. <b>AutoGrasp</b>: a UR5e + MAGPIE gripper that self-collects and grades its own grasp data, reaching a 97/100 policy with zero human labels (SPUR final project). <b>HAMS</b>: simulation work for a humanoid manipulation paper on the Correll Lab H1, comparing grasp methods and hardening the real-time sim stack. Papers in progress.</p>
+              <div className="metrics"><Metric v="97" label="/100 grasp policy" /><Metric v="1.8" pre="$" suf="M" label="ARPA-E lab" /></div>
+              <div className="chips"><span>ROS2</span><span>MuJoCo</span><span>Isaac Sim</span><span>ACT</span><span>GraspGenX</span></div>
             </div>
             <div className="xcard">
               <Img src="./images/cuquants.jpg" alt="CU Quants team" hint="images/cuquants.jpg" className="xcard-img" />
@@ -285,6 +285,13 @@ function Home() {
               <div className="metrics"><Metric v="97" label="/100 picks" /><Metric v="0" label="human labels" /><Metric v="66.7" label="episodes/hr" /></div>
               <div className="chips"><span>ROS2</span><span>SAM3</span><span>ACT</span><span>LeRobot</span><span>GraspGenX</span></div>
               <div className="cs-read">Read the case study →</div>
+            </a>
+            <a className="xcard xcard-link feature" href="https://github.com/correlllab/HAMS/tree/grasp-2method-comparison" target="_blank" rel="noreferrer">
+              <div className="feat-tag">Robotics Research · Simulation</div>
+              <div className="top"><div><h3>HAMS · Humanoid Sim Stack</h3><div className="role">Correll Lab · humanoid paper</div></div><div className="when">2026 · in progress</div></div>
+              <p>My simulation work for a humanoid manipulation paper on the Correll Lab H1. I work inside the sim stack (MuJoCo / RoboCasa and Isaac Sim over ROS2), run head-to-head comparisons of grasp-planning methods, and debug the hard real-time issues (DDS sensor drops, controller stability) that make a humanoid stand, grasp, and navigate reliably in sim.</p>
+              <div className="chips"><span>MuJoCo</span><span>RoboCasa</span><span>Isaac Sim</span><span>ROS2</span><span>Grasp comparison</span></div>
+              <div className="cs-read">View the code →</div>
             </a>
             <div className="xcard">
               <div className="top"><div><h3>Nara Vision</h3><div className="role">Computer-Vision Web App</div></div><div className="when">2020–21</div></div>
