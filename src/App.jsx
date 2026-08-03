@@ -250,6 +250,13 @@ function Home() {
               <div className="chips"><span>ROS2</span><span>MuJoCo</span><span>Isaac Sim</span><span>ACT</span><span>GraspGenX</span></div>
             </div>
             <div className="xcard">
+              <Img src="./images/naveera.jpg" alt="Naveera site rebuild" hint="images/naveera.jpg" className="xcard-img" />
+              <div className="top"><div><h3>Naveera · NEMT Software</h3><div className="role">Contract Web Engineer</div></div><div className="when">2026 · Denver</div></div>
+              <p>Rebuilding a Denver non-emergency medical transport routing company's site as one scroll-driven WebGL film. Their value is invisible in a screenshot, so the last beat is the product itself: pick a capability class, click the map, and the nearest <b>compliant</b> vehicle breaks route and runs the detour. The scene is a pure function of scroll position, which is what lets the client's real footage replace a 3D beat through one config field.</p>
+              <div className="metrics"><Metric v="19" label="prerendered routes" /><Metric v="5" label="beats, one camera move" /><Metric v="70" label="route/viewport checks" /></div>
+              <div className="chips"><span>Next.js 16</span><span>React 19</span><span>TypeScript</span><span>Three.js / R3F</span><span>GSAP ScrollTrigger</span></div>
+            </div>
+            <div className="xcard">
               <Img src="./images/cuquants.jpg" alt="CU Quants team" hint="images/cuquants.jpg" className="xcard-img" />
               <div className="top"><div><h3>CU Quants</h3><div className="role">Software Engineer</div></div><div className="when">2025–now</div></div>
               <p>Building <b>QuantX</b>, a market-simulation trading platform, plus an adversarial agent that stress-tests it. Support a student fund that beat the S&amp;P by 20% last quarter.</p>
@@ -293,6 +300,12 @@ function Home() {
               <p>My simulation work on the Correll Lab H1 humanoid: getting the stack to run on a laptop (CPU-only), a head-to-head comparison of grasp-planning methods, and the real-time debugging (DDS sensor drops, controller stability) that makes a humanoid grasp reliably in sim.</p>
               <div className="chips"><span>MuJoCo</span><span>RoboCasa</span><span>Isaac Sim</span><span>ROS2</span><span>Grasp comparison</span></div>
               <div className="cs-read">Read the case study →</div>
+            </a>
+            <a className="xcard xcard-link" href="https://naveeratest.netlify.app" target="_blank" rel="noreferrer">
+              <div className="top"><div><h3>Naveera Site Rebuild</h3><div className="role">WebGL · Contract · Denver</div></div><div className="when">2026 · in progress</div></div>
+              <p>One continuous camera move along a 21km road, fully procedural with no imported 3D models, ending in an interactive dispatch board that enforces capability as a hard constraint: a stretcher call is never answered by the ambulatory van parked next to it. Built so the client's real footage can replace any 3D beat without rewriting a transition.</p>
+              <div className="chips"><span>Next.js</span><span>Three.js</span><span>React Three Fiber</span><span>GSAP ScrollTrigger</span><span>TypeScript</span></div>
+              <div className="cs-read">View the build →</div>
             </a>
             <div className="xcard">
               <div className="top"><div><h3>Nara Vision</h3><div className="role">Computer-Vision Web App</div></div><div className="when">2020–21</div></div>
