@@ -3,6 +3,8 @@ import AutoGrasp from './AutoGrasp'
 import HamsSimulation from './HamsSimulation'
 
 const RESUME = 'Adam_Abid_Master.pdf'
+// Last known-good film count. Only used if public/letterboxd.json cannot be read.
+const FILM_COUNT_FALLBACK = 1043
 const WORDS = ['Applied ML', 'Robotics', 'Software', 'Customer-Focused']
 
 const RobotSVG = ({ className, id }) => (
@@ -94,7 +96,19 @@ function JourneyTimeline() {
 function Home() {
   const [ri, setRi] = useState(0)
   const [imgOk, setImgOk] = useState(false)
+  const [films, setFilms] = useState(FILM_COUNT_FALLBACK)
   const reduce = useRef(false)
+
+  // live Letterboxd count, refreshed daily by .github/workflows/letterboxd.yml
+  // falls back silently to FILM_COUNT_FALLBACK if the file is missing or malformed
+  useEffect(() => {
+    let alive = true
+    fetch('./letterboxd.json')
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (alive && d && Number.isFinite(d.films) && d.films > 0) setFilms(d.films) })
+      .catch(() => {})
+    return () => { alive = false }
+  }, [])
 
   // rotating positioning word
   useEffect(() => {
@@ -333,7 +347,7 @@ function Home() {
           <div className="fungrid">
             <div className="funcard">
               <div className="funtop"><span className="funicon">🎬</span><h3>Film</h3></div>
-              <p>1,043 films logged and counting. My four favorites:</p>
+              <p>{films.toLocaleString()} films logged and counting. My four favorites:</p>
               <div className="filmrow">
                 {FILMS.map(f => (
                   <a key={f.t} className="film-poster" href={f.url} target="_blank" rel="noreferrer">
@@ -355,7 +369,7 @@ function Home() {
               <p>I love trivia, especially history and sports. Give me a buzzer and a category and I'm happy.</p>
             </div>
             <div className="funcard">
-              <SwapImg srcs={['./images/coffee.jpg', './images/coffee2.jpg']} alt="Coffee" className="fun-img" />
+              <Img src="./images/coffee.jpg" alt="Coffee" hint="images/coffee.jpg" className="fun-img" />
               <div className="funtop"><span className="funicon">☕</span><h3>Coffee</h3></div>
               <p>I make my own at home, dialing in the grind and the ratio. It is the ritual that starts every build.</p>
             </div>

@@ -1,0 +1,40 @@
+name: Refresh Letterboxd film count
+
+on:
+  schedule:
+    # 09:10 UTC daily, which is 03:10 Denver in summer, 02:10 in winter.
+    # Off the hour on purpose: GitHub's scheduler is busiest at :00 and delays runs there.
+    - cron: '10 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: letterboxd-count
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Read the count from Letterboxd
+        run: node scripts/letterboxd-count.mjs
+
+      - name: Commit if the number changed
+        run: |
+          if git diff --quiet -- public/letterboxd.json; then
+            echo "No change. Nothing to commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/letterboxd.json
+          git commit -m "Update Letterboxd film count [skip ci]"
+          git push
