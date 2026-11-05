@@ -153,15 +153,38 @@ function Home() {
     hero.addEventListener('mousemove', onMove)
     size(); draw()
 
-    // robot cursor tracking
+    // robot orbits the photo: its spot on the ring follows the cursor's angle around the photo
     const eyes = document.querySelectorAll('#robot .eye'); const robot = document.getElementById('robot')
-    const onRobot = e => {
-      const cx = window.innerWidth * 0.72, cy = window.innerHeight * 0.5
-      const dx = Math.max(-3, Math.min(3, (e.clientX - cx) / 120)), dy = Math.max(-3, Math.min(3, (e.clientY - cy) / 120))
-      eyes.forEach(el => el.setAttribute('transform', 'translate(' + dx + ',' + dy + ')'))
-      if (robot) robot.style.transform = 'translate(' + (dx * 1.4) + 'px,' + (dy * 1.4) + 'px)'
+    const photo = document.querySelector('#hero .photo'); const orbit = document.getElementById('orbit'); const ring = document.getElementById('orbit-ring')
+    const REST = 40, RW = 120, RH = 130 // rest angle (deg, down-right like the old static spot), robot svg size
+    let ang = REST, target = REST, lean = 0, orbitRaf = 0
+    const place = () => {
+      const w = photo.offsetWidth, gap = parseFloat(getComputedStyle(orbit).getPropertyValue('--orbit-gap')) || 22
+      const r = w / 2 + gap, a = ang * Math.PI / 180
+      const x = w / 2 + r * Math.cos(a) - RW / 2, y = w / 2 + r * Math.sin(a) - RH / 2
+      robot.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + lean + 'deg)'
+      ring.style.transform = 'rotate(' + ang + 'deg)'
     }
-    if (!red) window.addEventListener('mousemove', onRobot)
+    const tick = () => {
+      const diff = ((target - ang + 540) % 360) - 180
+      ang += diff * 0.1
+      lean += (Math.max(-14, Math.min(14, diff * 0.5)) - lean) * 0.2
+      if (Math.abs(diff) < 0.05 && Math.abs(lean) < 0.05) { ang = target; lean = 0; place(); orbitRaf = 0; return }
+      place(); orbitRaf = requestAnimationFrame(tick)
+    }
+    const kick = () => { if (!orbitRaf) orbitRaf = requestAnimationFrame(tick) }
+    const onRobot = e => {
+      const pr = photo.getBoundingClientRect()
+      target = Math.atan2(e.clientY - (pr.top + pr.height / 2), e.clientX - (pr.left + pr.width / 2)) * 180 / Math.PI
+      const rr = robot.getBoundingClientRect(), ex = e.clientX - (rr.left + rr.width / 2), ey = e.clientY - (rr.top + rr.height / 2)
+      const d = Math.hypot(ex, ey) || 1, k = Math.min(3, d / 40)
+      eyes.forEach(el => el.setAttribute('transform', 'translate(' + (ex / d * k) + ',' + (ey / d * k) + ')'))
+      kick()
+    }
+    const onLeave = () => { target = REST; eyes.forEach(el => el.setAttribute('transform', 'translate(0,0)')); kick() }
+    place(); robot.classList.add('placed'); requestAnimationFrame(() => orbit.classList.add('on'))
+    window.addEventListener('resize', place)
+    if (!red) { hero.addEventListener('mousemove', onRobot); hero.addEventListener('mouseleave', onLeave) }
 
     // reveal
     const io = new IntersectionObserver(en => en.forEach(x => x.isIntersecting && x.target.classList.add('in')), { threshold: .18 })
@@ -183,7 +206,8 @@ function Home() {
 
     return () => {
       window.removeEventListener('scroll', onNav); window.removeEventListener('resize', size)
-      window.removeEventListener('scroll', onScroll); window.removeEventListener('mousemove', onRobot)
+      window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', place)
+      hero.removeEventListener('mousemove', onRobot); hero.removeEventListener('mouseleave', onLeave); cancelAnimationFrame(orbitRaf)
       hero.removeEventListener('mousemove', onMove); cancelAnimationFrame(raf); io.disconnect(); cio.disconnect()
     }
   }, [])
@@ -222,6 +246,7 @@ function Home() {
               {!imgOk && <div className="photo-fallback"><svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="18" fill="#2E8B7F" /><path d="M22 82c0-16 12-26 28-26s28 10 28 26" fill="#2E8B7F" /></svg></div>}
               {!imgOk && <span className="ph">save your photo as profile.jpg</span>}
             </div>
+            <div className="orbit" id="orbit" aria-hidden="true"><div className="orbit-ring" id="orbit-ring"></div></div>
             <RobotSVG id="robot" className="robot-hero" />
             </div>
           </div>

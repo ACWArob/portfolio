@@ -50,7 +50,13 @@ h1.name{font-family:var(--disp);font-weight:700;font-size:clamp(56px,8.5vw,112px
 .photo-fallback{position:absolute;inset:0;display:grid;place-items:center;border-radius:50%}
 .photo-fallback svg{width:130px;height:130px;opacity:.6}
 .photo .ph{font-family:var(--mono);font-size:11px;color:var(--dim);position:absolute;bottom:-24px;width:100%;text-align:center}
-.robot-hero{position:absolute;right:-10px;bottom:-6px}
+.robot-hero{position:absolute;left:0;top:0;z-index:3;transform-origin:50% 92%;opacity:0;will-change:transform}
+.robot-hero.placed{opacity:1;transition:opacity .5s ease}
+.orbit{--orbit-gap:22px;position:absolute;inset:calc(var(--orbit-gap) * -1);pointer-events:none;opacity:0;transform:scale(.94);transition:opacity .9s cubic-bezier(.2,.8,.2,1),transform .9s cubic-bezier(.2,.8,.2,1)}
+.orbit.on{opacity:1;transform:none}
+.orbit-ring{position:absolute;inset:0;border-radius:50%;border:1.5px dashed rgba(95,191,176,.38)}
+@media(max-width:820px){.orbit{--orbit-gap:16px}}
+@media(prefers-reduced-motion:reduce){.orbit,.robot-hero.placed{transition:none}}
 .scrollhint{position:absolute;bottom:26px;left:48px;font-family:var(--mono);font-size:12px;color:var(--dim);z-index:2}
 .scrollhint span{display:inline-block;animation:bob 1.6s infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
