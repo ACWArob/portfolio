@@ -69,7 +69,7 @@ const MS = [
   { year: '2024', place: 'Bay Area', title: 'Clinic Platform', img: 'clinic', city: 'bay', desc: 'Shipped a full-stack scheduling app that cut double-bookings 90% (Django REST, AJAX, Google OAuth).' },
   { year: '2025', place: 'Boulder', title: 'CU Boulder + Research', img: 'cuboulder', city: 'boulder', desc: 'Started CS + Statistics (graduating May 2028) and joined the $1.8M ARPA-E Correll lab and CU Quants.' },
   { year: '2026', place: 'Boulder', title: 'NSBE Torch Chair', img: 'nsbe', city: 'boulder', desc: "Torch Chair for CU Boulder's National Society of Black Engineers chapter, growing the community and pipeline for the next generation of engineers." },
-  { year: '2026', place: 'Boulder', title: 'AutoGrasp + Humanoid Sim', img: 'autograsp', city: 'boulder', desc: 'A UR5e that collects and grades its own grasp data, reaching a 97/100 policy with zero human labels, plus humanoid simulation work (HAMS). Papers in progress.' },
+  { year: '2026', place: 'Boulder', title: 'AutoGrasp + Humanoid Sim', img: 'autograsp', city: 'boulder', desc: 'A UR5e that collects and grades its own grasp data, reaching a 97/100 policy with zero human labels, plus humanoid simulation work (HAMS) that fed the GOLEM paper. AutoGrasp paper in progress.' },
   { year: '2027', place: 'Next', title: 'The dream internship', img: 'goal', city: 'boulder', desc: 'To be determined 👀' },
 ]
 
@@ -262,7 +262,7 @@ function Home() {
             <div className="xcard">
               <Img src="./images/correll.jpg" alt="Correll Lab" hint="images/correll.jpg" className="xcard-img" />
               <div className="top"><div><h3>Correll Lab · CU Robotics</h3><div className="role">Research Assistant</div></div><div className="when">2025–now</div></div>
-              <p>Two robotics projects. <b>AutoGrasp</b>: a UR5e + MAGPIE gripper that self-collects and grades its own grasp data, reaching a 97/100 policy with zero human labels (SPUR final project). <b>HAMS</b>: simulation work for a humanoid manipulation paper on the Correll Lab H1, comparing grasp methods and hardening the real-time sim stack. Papers in progress.</p>
+              <p>Two robotics projects. <b>AutoGrasp</b>: a UR5e + MAGPIE gripper that self-collects and grades its own grasp data, reaching a 97/100 policy with zero human labels (SPUR final project). <b>HAMS</b>: simulation work for a humanoid manipulation paper on the Correll Lab H1, comparing grasp methods and hardening the real-time sim stack, which fed the lab's GOLEM paper (arXiv 2608.21550). AutoGrasp paper in progress.</p>
               <div className="metrics"><Metric v="97" label="/100 grasp policy" /><Metric v="1.8" pre="$" suf="M" label="ARPA-E lab" /></div>
               <div className="chips"><span>ROS2</span><span>MuJoCo</span><span>Isaac Sim</span><span>ACT</span><span>GraspGenX</span></div>
             </div>
@@ -272,6 +272,12 @@ function Home() {
               <p>Rebuilding a Denver non-emergency medical transport routing company's site as one scroll-driven WebGL film. Their value is invisible in a screenshot, so the last beat is the product itself: pick a capability class, click the map, and the nearest <b>compliant</b> vehicle breaks route and runs the detour. The scene is a pure function of scroll position, which is what lets the client's real footage replace a 3D beat through one config field.</p>
               <div className="metrics"><Metric v="19" label="prerendered routes" /><Metric v="5" label="beats, one camera move" /><Metric v="70" label="route/viewport checks" /></div>
               <div className="chips"><span>Next.js 16</span><span>React 19</span><span>TypeScript</span><span>Three.js / R3F</span><span>GSAP ScrollTrigger</span></div>
+            </div>
+            <div className="xcard">
+              <div className="top"><div><h3>Campos Student Center · CU Boulder</h3><div className="role">Community and Scholarship Assistant</div></div><div className="when">2026–now</div></div>
+              <p>Mentoring first-year BOLD Scholars one-on-one with resource referrals as they start at CU Boulder, co-planning community events with Campos staff, and managing participation and quiz data for program staff.</p>
+              <div className="metrics"><Metric v="4" suf="+" label="events" /><Metric v="100" suf="+" label="students reached" /><Metric v="80" suf="+" label="students tracked" /></div>
+              <div className="chips"><span>Mentoring</span><span>Leadership</span><span>Events</span><span>Data</span></div>
             </div>
             <div className="xcard">
               <Img src="./images/cuquants.jpg" alt="CU Quants team" hint="images/cuquants.jpg" className="xcard-img" />
@@ -313,8 +319,9 @@ function Home() {
             </a>
             <a className="xcard xcard-link feature" href="#/projects/hams-simulation">
               <div className="feat-tag">Robotics Research · Simulation</div>
-              <div className="top"><div><h3>HAMS Simulation</h3><div className="role">Correll Lab · humanoid paper</div></div><div className="when">2026 · in progress</div></div>
-              <p>My simulation work on the Correll Lab H1 humanoid: getting the stack to run on a laptop (CPU-only), a head-to-head comparison of grasp-planning methods, and the real-time debugging (DDS sensor drops, controller stability) that makes a humanoid grasp reliably in sim.</p>
+              <div className="top"><div><h3>HAMS Simulation</h3><div className="role">Correll Lab · humanoid paper</div></div><div className="when">2026</div></div>
+              <p>My simulation work on HAMS, the Correll Lab's Unitree H1 stack: four grasp-planning methods compared across frozen, hanging and standing bases, a world-frame executor fix that took centroid grasping on a standing robot from 0 to 24 of 30 trials, and a CPU-only port so the sim runs on a laptop. It fed the lab's GOLEM paper.</p>
+              <div className="metrics"><Metric v="24" label="/30 standing grasps, up from 0" /><Metric v="4" label="grasp methods compared" /></div>
               <div className="chips"><span>MuJoCo</span><span>RoboCasa</span><span>Isaac Sim</span><span>ROS2</span><span>Grasp comparison</span></div>
               <div className="cs-read">Read the case study →</div>
             </a>
