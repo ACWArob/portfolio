@@ -22,7 +22,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const OUT = join(ROOT, 'public', 'letterboxd.json')
 const DRY = process.argv.includes('--dry-run')
 
-const UA = 'acwa-portfolio-filmcount/1.0 (+https://acwa-portfolio.netlify.app)'
+const UA = 'acwa-portfolio-filmcount/1.0 (+https://acwa-portfolio.vercel.app)'
 
 function fail(msg) {
   console.error(`FAIL: ${msg}`)
