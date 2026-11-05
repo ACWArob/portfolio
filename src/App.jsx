@@ -103,8 +103,11 @@ function Home() {
   // falls back silently to FILM_COUNT_FALLBACK if the file is missing or malformed
   useEffect(() => {
     let alive = true
-    fetch('./letterboxd.json')
-      .then(r => (r.ok ? r.json() : null))
+    // read straight from GitHub so the nightly count update shows up without a Netlify deploy
+    fetch('https://raw.githubusercontent.com/ACWArob/portfolio/main/public/letterboxd.json', { cache: 'no-store' })
+      .then(r => (r.ok ? r : fetch('./letterboxd.json')))
+      .catch(() => fetch('./letterboxd.json'))
+      .then(r => (r && r.ok ? r.json() : null))
       .then(d => { if (alive && d && Number.isFinite(d.films) && d.films > 0) setFilms(d.films) })
       .catch(() => {})
     return () => { alive = false }
