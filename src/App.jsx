@@ -1,11 +1,15 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import AutoGrasp from './AutoGrasp'
 import HamsSimulation from './HamsSimulation'
 
 const RESUME = 'Adam_Abid_Master.pdf'
 // Last known-good film count. Only used if public/letterboxd.json cannot be read.
 const FILM_COUNT_FALLBACK = 1043
-const WORDS = ['Applied ML', 'Robotics', 'Software', 'Customer-Focused']
+const LAB = [
+  { src: './images/autograsp.jpg', alt: 'UR5e arm with the MAGPIE gripper picking up a block', cap: 'AutoGrasp · UR5e + MAGPIE gripper', pos: '50% 62%' },
+  { src: './images/golem.jpg', alt: 'Unitree H1-2 humanoid at the battery disassembly cell', cap: 'GOLEM · Unitree H1-2, Correll Lab', pos: '50% 45%' },
+  { src: './images/correll.jpg', alt: 'Adam presenting a research poster on fine-tuning SmolVLA', cap: 'Poster · fine-tuning SmolVLA, CU Boulder', pos: '60% 40%' },
+]
 
 const RobotSVG = ({ className, id }) => (
   <svg id={id} className={className} width="120" height="130" viewBox="0 0 120 130">
@@ -94,10 +98,9 @@ function JourneyTimeline() {
 }
 
 function Home() {
-  const [ri, setRi] = useState(0)
   const [imgOk, setImgOk] = useState(false)
   const [films, setFilms] = useState(FILM_COUNT_FALLBACK)
-  const reduce = useRef(false)
+  const [labOpen, setLabOpen] = useState(false)
 
   // live Letterboxd count, refreshed daily by .github/workflows/letterboxd.yml
   // falls back silently to FILM_COUNT_FALLBACK if the file is missing or malformed
@@ -113,45 +116,22 @@ function Home() {
     return () => { alive = false }
   }, [])
 
-  // rotating positioning word
+  // lab photos stay hidden until the robot (or the text toggle) is clicked
   useEffect(() => {
-    reduce.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduce.current) return
-    const id = setInterval(() => setRi(i => (i + 1) % WORDS.length), 2200)
-    return () => clearInterval(id)
-  }, [])
+    if (!labOpen) return
+    const red = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    document.getElementById('lab-strip')?.scrollIntoView({ behavior: red ? 'auto' : 'smooth', block: 'nearest' })
+  }, [labOpen])
 
-  // canvas net, robot tracking, reveals, timeline, count-up
+  // grasp path, robot orbit, reveals, timeline, count-up
   useEffect(() => {
     const red = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const nav = document.getElementById('nav')
     const onNav = () => nav && nav.classList.toggle('scrolled', window.scrollY > 40)
     window.addEventListener('scroll', onNav)
 
-    // neural network
-    const cv = document.getElementById('net'); const ctx = cv.getContext('2d')
-    let W, H, nodes = [], raf, mouse = { x: -999, y: -999 }
-    const build = () => { nodes = []; const n = Math.min(64, Math.floor(W * H / 22000)); for (let k = 0; k < n; k++) nodes.push({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35 }) }
-    const size = () => { W = cv.width = cv.offsetWidth; H = cv.height = cv.offsetHeight; build() }
-    const draw = () => {
-      ctx.clearRect(0, 0, W, H)
-      for (let a = 0; a < nodes.length; a++) {
-        const p = nodes[a]
-        if (!red) { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1 }
-        for (let b = a + 1; b < nodes.length; b++) {
-          const q = nodes[b], d = Math.hypot(p.x - q.x, p.y - q.y)
-          if (d < 140) { ctx.strokeStyle = 'rgba(46,139,127,' + (0.45 * (1 - d / 140)) + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke() }
-        }
-        const md = Math.hypot(p.x - mouse.x, p.y - mouse.y)
-        ctx.beginPath(); ctx.arc(p.x, p.y, md < 120 ? 3.2 : 2, 0, 7); ctx.fillStyle = md < 120 ? '#5FBFB0' : 'rgba(95,191,176,.55)'; ctx.fill()
-      }
-      if (!red) raf = requestAnimationFrame(draw)
-    }
-    window.addEventListener('resize', size)
     const hero = document.getElementById('hero')
-    const onMove = e => { mouse.x = e.clientX; mouse.y = e.clientY }
-    hero.addEventListener('mousemove', onMove)
-    size(); draw()
+
 
     // robot orbits the photo: its spot on the ring follows the cursor's angle around the photo
     const eyes = document.querySelectorAll('#robot .eye'); const robot = document.getElementById('robot')
@@ -186,6 +166,41 @@ function Home() {
     window.addEventListener('resize', place)
     if (!red) { hero.addEventListener('mousemove', onRobot); hero.addEventListener('mouseleave', onLeave) }
 
+    // grasp path: a dotted end-effector trajectory (approach, align, grasp) that ends on the photo's orbit ring
+    const gp = document.getElementById('grasp-path')
+    const gpMain = document.getElementById('gp-main'), gpMask = document.getElementById('gp-mpath')
+    const gpGhosts = gp.querySelectorAll('.gp-ghost'), gpWps = gp.querySelectorAll('.gp-wp'), gpLabels = gp.querySelectorAll('text')
+    let gpDrawn = false, gpTimer = 0
+    const gpFinish = () => { gpMask.style.transition = ''; gpMask.style.strokeDasharray = ''; gpMask.style.strokeDashoffset = ''; gp.classList.add('done') }
+    const drawPath = () => {
+      const hr = hero.getBoundingClientRect(), pr = photo.getBoundingClientRect()
+      const W = hr.width, H = hr.height
+      gp.setAttribute('viewBox', '0 0 ' + W + ' ' + H)
+      const gap = parseFloat(getComputedStyle(orbit).getPropertyValue('--orbit-gap')) || 22
+      const px = pr.left - hr.left + pr.width / 2, py = pr.top - hr.top + pr.height / 2, R = pr.width / 2 + gap
+      const S = [px - 4.6 * R, H - 40], W1 = [px - 1.8 * R, py + 0.9 * R], W2 = [px - 1.45 * R, py + 0.05 * R]
+      const ea = 205 * Math.PI / 180, E = [px + R * Math.cos(ea), py + R * Math.sin(ea)]
+      const f = v => v[0].toFixed(1) + ' ' + v[1].toFixed(1)
+      const d = 'M ' + f(S) + ' C ' + f([S[0] + (W1[0] - S[0]) * 0.6, S[1]]) + ' ' + f([W1[0] - 0.35 * R, W1[1] + 0.55 * R]) + ' ' + f(W1) +
+        ' S ' + f([W2[0] - 0.05 * R, W2[1] + 0.45 * R]) + ' ' + f(W2) + ' S ' + f([E[0] - 0.55 * R, E[1] + 0.05 * R]) + ' ' + f(E)
+      gpMain.setAttribute('d', d); gpMask.setAttribute('d', d); gpGhosts.forEach(g => g.setAttribute('d', d))
+      ;[W1, W2, E].forEach((w, i) => { gpWps[i].setAttribute('cx', w[0]); gpWps[i].setAttribute('cy', w[1]) })
+      const lp = [[W1[0] + 16, W1[1] + 4], [W2[0] + 14, W2[1] - 12], [E[0] - 76, E[1] - 14]]
+      gpLabels.forEach((t, i) => { t.setAttribute('x', lp[i][0]); t.setAttribute('y', lp[i][1]) })
+      if (gpDrawn) return
+      gpDrawn = true
+      let L = 0
+      try { L = gpMain.getTotalLength() } catch (e) { L = 0 }
+      if (red || !L) { gpFinish(); return }
+      gpMask.style.strokeDasharray = L + ' ' + L; gpMask.style.strokeDashoffset = L
+      gpMask.getBoundingClientRect()
+      requestAnimationFrame(() => { gpMask.style.transition = 'stroke-dashoffset 1.8s cubic-bezier(.45,0,.2,1) .25s'; gpMask.style.strokeDashoffset = 0 })
+      gpMask.addEventListener('transitionend', gpFinish, { once: true })
+      gpTimer = setTimeout(gpFinish, 2600)
+    }
+    const ro = new ResizeObserver(() => { if (gpDrawn && !gp.classList.contains('done')) gpFinish(); drawPath() })
+    ro.observe(hero); drawPath()
+
     // reveal
     const io = new IntersectionObserver(en => en.forEach(x => x.isIntersecting && x.target.classList.add('in')), { threshold: .18 })
     document.querySelectorAll('.node,.xcard').forEach(el => io.observe(el))
@@ -205,10 +220,10 @@ function Home() {
     document.querySelectorAll('[data-count]').forEach(el => { if (red) el.textContent = (el.dataset.prefix || '') + el.dataset.count + (el.dataset.suffix || ''); else cio.observe(el) })
 
     return () => {
-      window.removeEventListener('scroll', onNav); window.removeEventListener('resize', size)
+      window.removeEventListener('scroll', onNav); ro.disconnect(); clearTimeout(gpTimer)
       window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', place)
       hero.removeEventListener('mousemove', onRobot); hero.removeEventListener('mouseleave', onLeave); cancelAnimationFrame(orbitRaf)
-      hero.removeEventListener('mousemove', onMove); cancelAnimationFrame(raf); io.disconnect(); cio.disconnect()
+      io.disconnect(); cio.disconnect()
     }
   }, [])
 
@@ -225,19 +240,27 @@ function Home() {
 
       {/* HERO */}
       <section id="hero">
-        <canvas id="net"></canvas>
+        <svg id="grasp-path" className="grasp-path" aria-hidden="true">
+          <defs><mask id="gp-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%"><path id="gp-mpath" className="gp-mpath" /></mask></defs>
+          <path className="gp-ghost late" transform="translate(18 -22)" />
+          <path className="gp-ghost late" transform="translate(-26 30)" />
+          <path id="gp-main" className="gp-main" mask="url(#gp-mask)" />
+          <circle className="gp-wp late" r="5" /><circle className="gp-wp late" r="5" /><circle className="gp-wp gp-end late" r="4" />
+          <text className="late">01 approach</text><text className="late">02 align</text><text className="late">03 grasp</text>
+        </svg>
         <div className="wrap hero-grid">
           <div>
-            <div className="kicker">FOCUSED ON <span className="rotor"><span className="rotor-word" key={ri}>{WORDS[ri]}</span></span></div>
+            <div className="kicker">Builder-researcher · Robotics &amp; ML</div>
             <h1 className="name">ADAM ABID</h1>
             <p className="tagline">I build intelligent systems, and the communities around them.</p>
-            <div className="loc"><span>📍 <b>Boulder</b></span><span>·</span><span><b>Bay Area</b></span></div>
+            <div className="loc"><span><b>Boulder</b></span><span>·</span><span><b>Bay Area</b></span></div>
             <div className="cta">
               <a className="primary" href="#experience">View Work →</a>
               <a href={RESUME} target="_blank" rel="noreferrer">Résumé</a>
               <a href="https://linkedin.com/in/adam-w-abid" target="_blank" rel="noreferrer">LinkedIn</a>
               <a href="https://github.com/acwarob" target="_blank" rel="noreferrer">GitHub</a>
             </div>
+            <button type="button" className="lab-toggle" aria-expanded={labOpen} aria-controls="lab-strip" onClick={() => setLabOpen(o => !o)}>{labOpen ? 'hide the lab ↑' : 'see the lab ↓'}</button>
           </div>
           <div className="hero-visual">
             <div className="photo-wrap">
@@ -247,12 +270,24 @@ function Home() {
               {!imgOk && <span className="ph">save your photo as profile.jpg</span>}
             </div>
             <div className="orbit" id="orbit" aria-hidden="true"><div className="orbit-ring" id="orbit-ring"></div></div>
-            <RobotSVG id="robot" className="robot-hero" />
+            <button type="button" id="robot" className="robot-hero robot-btn" aria-label={labOpen ? 'Hide lab photos' : 'Show lab photos'} aria-expanded={labOpen} aria-controls="lab-strip" title="see the lab" onClick={() => setLabOpen(o => !o)}><RobotSVG /></button>
             </div>
           </div>
         </div>
         <div className="scrollhint mono"><span>scroll ↓</span></div>
       </section>
+
+      {/* LAB PHOTOS: revealed on click */}
+      <div id="lab-strip" className="lab-strip" hidden={!labOpen}>
+        <div className="wrap lab-grid">
+          {LAB.map((f, i) => (
+            <figure key={f.src} style={{ '--i': i }}>
+              <img src={f.src} alt={f.alt} loading="lazy" style={{ objectPosition: f.pos }} />
+              <figcaption>{f.cap}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
 
       {/* ABOUT */}
       <section id="about" className="pad">

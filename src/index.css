@@ -29,11 +29,19 @@ nav.scrolled{background:rgba(15,18,17,.9);border-bottom:1px solid var(--line)}
 
 /* HERO */
 #hero{min-height:100vh;display:flex;align-items:center;overflow:hidden;position:relative}
-#net{position:absolute;inset:0;z-index:0}
+/* grasp path: dotted end-effector trajectory behind the hero */
+.grasp-path{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible}
+.grasp-path .gp-main,.grasp-path .gp-ghost{fill:none;stroke:var(--sea-glow);stroke-linecap:round}
+.grasp-path .gp-main{stroke-opacity:.7;stroke-width:2;stroke-dasharray:2 8}
+.grasp-path .gp-ghost{stroke-opacity:.13;stroke-width:1.5;stroke-dasharray:2 9}
+.grasp-path .gp-mpath{fill:none;stroke:#fff;stroke-width:10;stroke-linecap:round}
+.grasp-path .gp-wp{fill:var(--ink);stroke:var(--sea-glow);stroke-width:2}
+.grasp-path .gp-end{fill:var(--sea-glow);stroke:none}
+.grasp-path text{font-family:var(--mono);font-size:12px;fill:var(--dim)}
+.grasp-path .late{opacity:0;transition:opacity .7s ease}
+.grasp-path.done .late{opacity:1}
+@media(max-width:1100px){.grasp-path{display:none}}
 .hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.25fr .75fr;gap:60px;align-items:center;width:100%}
-.rotor{display:inline-block;margin-left:8px;min-width:170px}
-.rotor-word{display:inline-block;color:var(--sea-glow);animation:rotin .5s ease}
-@keyframes rotin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 h1.name{font-family:var(--disp);font-weight:700;font-size:clamp(56px,8.5vw,112px);line-height:.95;letter-spacing:-1px;color:var(--near);margin:16px 0 10px}
 .tagline{font-family:var(--disp);font-size:clamp(21px,2.6vw,32px);color:var(--muted);font-weight:400;max-width:660px;line-height:1.35}
 .loc{margin-top:18px;font-family:var(--mono);font-size:14px;color:var(--dim);display:flex;gap:14px;flex-wrap:wrap}
@@ -52,6 +60,21 @@ h1.name{font-family:var(--disp);font-weight:700;font-size:clamp(56px,8.5vw,112px
 .photo .ph{font-family:var(--mono);font-size:11px;color:var(--dim);position:absolute;bottom:-24px;width:100%;text-align:center}
 .robot-hero{position:absolute;left:0;top:0;z-index:3;transform-origin:50% 92%;opacity:0;will-change:transform}
 .robot-hero.placed{opacity:1;transition:opacity .5s ease}
+.robot-btn{width:120px;height:130px;padding:0;border:0;background:none;cursor:pointer;display:block}
+.robot-btn svg{display:block;transition:filter .25s ease}
+.robot-btn:hover svg,.robot-btn[aria-expanded="true"] svg{filter:drop-shadow(0 0 14px rgba(95,191,176,.45))}
+.robot-btn:focus-visible{outline:2px solid var(--sea-glow);outline-offset:4px;border-radius:16px}
+.lab-toggle{margin-top:22px;background:none;border:0;padding:4px 0;font-family:var(--mono);font-size:13px;color:var(--dim);cursor:pointer;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:5px;transition:color .2s}
+.lab-toggle:hover,.lab-toggle[aria-expanded="true"]{color:var(--sea-glow)}
+.lab-toggle:focus-visible{outline:2px solid var(--sea-glow);outline-offset:4px}
+.lab-strip{padding:56px 0 8px;border-top:1px solid var(--line)}
+.lab-strip[hidden]{display:none}
+.lab-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.lab-grid figure{margin:0;display:flex;flex-direction:column;gap:10px;animation:labIn .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 90ms)}
+.lab-grid img{width:100%;height:220px;object-fit:cover;border-radius:6px;display:block;background:var(--ink2)}
+.lab-grid figcaption{font-family:var(--mono);font-size:12px;color:var(--dim)}
+@keyframes labIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media(max-width:820px){.lab-grid{grid-template-columns:1fr}.lab-grid img{height:200px}}
 .orbit{--orbit-gap:22px;position:absolute;inset:calc(var(--orbit-gap) * -1);pointer-events:none;opacity:0;transform:scale(.94);transition:opacity .9s cubic-bezier(.2,.8,.2,1),transform .9s cubic-bezier(.2,.8,.2,1)}
 .orbit.on{opacity:1;transform:none}
 .orbit-ring{position:absolute;inset:0;border-radius:50%;border:1.5px dashed rgba(95,191,176,.38)}
