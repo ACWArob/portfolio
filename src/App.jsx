@@ -315,6 +315,37 @@ function Home() {
               <div className="chips"><span>MuJoCo</span><span>RoboCasa</span><span>Isaac Sim</span><span>ROS2</span><span>Grasp comparison</span></div>
               <div className="cs-read">Read the case study →</div>
             </a>
+            <a className="xcard xcard-link" href="https://arxiv.org/abs/2608.21550" target="_blank" rel="noreferrer">
+              <Img src="./images/golem.jpg" alt="Unitree H1-2 humanoid at the RAPID battery disassembly cell" hint="images/golem.jpg" className="xcard-img" />
+              <div className="feat-tag">Paper · arXiv 2608.21550</div>
+              <div className="top"><div><h3>GOLEM</h3><div className="role">Correll Lab · co-author</div></div><div className="when">2026</div></div>
+              <p>Modular humanoid autonomy for EV battery disassembly on the Unitree H1-2: walking, balance, manipulation, navigation and memory are swappable modules behind common interfaces, in sim and on the real robot. My part was the simulated fridge-handle grasp benchmark in RoboCasa, comparing centroid, antipodal and GraspGenX grasping with the robot tethered and standing.</p>
+              <div className="chips"><span>Unitree H1-2</span><span>ROS 2</span><span>MuJoCo</span><span>RoboCasa</span><span>GraspGenX</span></div>
+              <div className="cs-read">Read the paper →</div>
+            </a>
+            <a className="xcard xcard-link" href="https://devpost.com/software/niche-flg7ip" target="_blank" rel="noreferrer">
+              <Img src="./images/niche.jpg" alt="Niche app: swipe real clothes and see them on you" hint="images/niche.jpg" className="xcard-img" />
+              <div className="top"><div><h3>Niche</h3><div className="role">Cal Hacks 13.0 · with Nabil and Ryan Djaber</div></div><div className="when">2026</div></div>
+              <p>A shopping app that styles new clothes around the closet you already own: swipe real listings from 8 stores, see each piece on your own photo, and check out once across every store. Claude ranks the feed rules-first and scores fits, Gemini swaps one garment into your real photo, and Capital One's Nessie API splits one cart into a purchase per store.</p>
+              <div className="metrics"><Metric v="0" suf="%" label="style clashes, down from 11%" /><Metric v="780" label="backend tests" /><Metric v="8" label="stores, one cart" /></div>
+              <div className="chips"><span>Flutter</span><span>FastAPI</span><span>Claude</span><span>Gemini</span><span>Capital One Nessie</span></div>
+              <div className="cs-read">View on Devpost →</div>
+            </a>
+            <a className="xcard xcard-link" href="https://github.com/ACWArob/ask-algeria" target="_blank" rel="noreferrer">
+              <Img src="./images/askalgeria.jpg" alt="Ask Algeria home page" hint="images/askalgeria.jpg" className="xcard-img" />
+              <div className="top"><div><h3>Ask Algeria</h3><div className="role">Multilingual civic assistant</div></div><div className="when">2026</div></div>
+              <p>Plain answers about Algerian public services in English, French, Arabic and Darija, taken only from official pages. It searches about 1,150 official pages and PDFs, cites every fact, and tailors answers to your own wilaya or consulate. Many .dz sites block foreign visitors, so a tester inside Algeria runs a polite crawler to keep pages current. Independent, not a government site.</p>
+              <div className="metrics"><Metric v="146" label="missions in 104 countries" /><Metric v="4" label="languages" /></div>
+              <div className="chips"><span>Next.js</span><span>TypeScript</span><span>Claude API</span><span>MiniSearch</span><span>Vercel</span></div>
+              <div className="cs-read">View on GitHub →</div>
+            </a>
+            <a className="xcard xcard-link" href="https://github.com/ACWArob/Trace" target="_blank" rel="noreferrer">
+              <Img src="./images/trace.jpg" alt="Trace cinema shelf" hint="images/trace.jpg" className="xcard-img" />
+              <div className="top"><div><h3>Trace</h3><div className="role">Personal media tracker</div></div><div className="when">2026</div></div>
+              <p>Films, TV, books, albums and memories, each in its own illustrated room. Imports full Letterboxd, Goodreads and IMDb histories, searches real catalogs, and blends public ratings into a Trace score weighted by vote count, with the formula on screen. Browser JavaScript and the Python standard library, no install step or paid API.</p>
+              <div className="chips"><span>JavaScript</span><span>Python</span><span>SQLite</span><span>Product Design</span></div>
+              <div className="cs-read">View on GitHub →</div>
+            </a>
             <a className="xcard xcard-link" href="https://naveeratest.netlify.app" target="_blank" rel="noreferrer">
               <div className="top"><div><h3>Naveera Site Rebuild</h3><div className="role">WebGL · Contract · Denver</div></div><div className="when">2026 · in progress</div></div>
               <p>One continuous camera move along a 21km road, fully procedural with no imported 3D models, ending in an interactive dispatch board that enforces capability as a hard constraint: a stretcher call is never answered by the ambulatory van parked next to it. Built so the client's real footage can replace any 3D beat without rewriting a transition.</p>
