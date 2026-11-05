@@ -5,6 +5,9 @@ import HamsSimulation from './HamsSimulation'
 const RESUME = 'Adam_Abid_Master.pdf'
 // Last known-good film count. Only used if public/letterboxd.json cannot be read.
 const FILM_COUNT_FALLBACK = 1043
+// Writing section stays hidden until there are real articles to link
+const SHOW_WRITING = false
+
 const LAB = [
   { src: './images/autograsp.jpg', alt: 'UR5e arm with the MAGPIE gripper picking up a block', cap: 'AutoGrasp · UR5e + MAGPIE gripper', pos: '50% 62%' },
   { src: './images/golem.jpg', alt: 'Unitree H1-2 humanoid at the battery disassembly cell', cap: 'GOLEM · Unitree H1-2, Correll Lab', pos: '50% 45%' },
@@ -26,12 +29,13 @@ const RobotSVG = ({ className, id }) => (
 
 const Metric = ({ v, pre = '', suf = '', label }) => <div><b data-count={v} data-prefix={pre} data-suffix={suf}>{pre}0{suf}</b><small>{label}</small></div>
 
-const Img = ({ src, alt, hint, className }) => {
+// image with a quiet dotted-grid fallback (never shows a file path to visitors)
+const Img = ({ src, alt, className, fit, bg, ph }) => {
   const [ok, setOk] = useState(false)
   return (
-    <div className={'imgbox ' + (className || '')}>
-      <img src={src} alt={alt} loading="lazy" style={{ opacity: ok ? 1 : 0 }} onLoad={() => setOk(true)} onError={() => setOk(false)} />
-      {!ok && <span className="imghint">{hint}</span>}
+    <div className={'imgbox ' + (fit === 'contain' ? 'contain ' : '') + (className || '')} style={ok && bg ? { background: bg } : undefined}>
+      {src && <img src={src} alt={alt} loading="lazy" style={{ opacity: ok ? 1 : 0 }} onLoad={() => setOk(true)} onError={() => setOk(false)} />}
+      {!ok && ph && <span className="imghint">{ph}</span>}
     </div>
   )
 }
@@ -65,7 +69,7 @@ const CITIES = {
 }
 
 const MS = [
-  { year: '2020–21', place: 'Bay Area', title: 'Nara Vision', img: 'nara', city: 'bay', desc: 'My first AI build: a Google Cloud Vision web app doing landmark, logo, OCR, emotion, and species recognition across 100+ images, demoed at the Synopsys Science Fair.' },
+  { year: '2020–21', place: 'Bay Area', title: 'Nara Vision', img: 'nara', fit: 'contain', bg: '#96F2CC', city: 'bay', desc: 'My first AI build: a Google Cloud Vision web app doing landmark, logo, OCR, emotion, and species recognition across 100+ images, demoed at the Synopsys Science Fair.' },
   { year: '2022', place: 'Dubai', title: 'Snap Inc. (AR Intern)', img: 'snap', city: 'dubai', desc: 'Shipped AR lenses used 100k+ times in Lens Studio with custom Blender models.' },
   { year: '2022', place: 'Tunisia', title: 'AIHack Tunisia × Bamboogeeks', img: 'aihack', city: 'tunis', desc: "Mentored 50+ builders at Africa & MENA's biggest ML hackathon (InstaDeep × Google, 1,000+ participants)." },
   { year: '2022–24', place: 'Dubai', title: 'High School Events', img: 'highschool', city: 'dubai', desc: "Founded my school's Muslim Student Association (70K+ AED raised for charity) and ran a charity football match (300+) and t-shirt fundraiser (300+ sold) that raised another 56K+ AED, alongside a school-wide Ideathon." },
@@ -74,7 +78,7 @@ const MS = [
   { year: '2025', place: 'Boulder', title: 'CU Boulder + Research', img: 'cuboulder', city: 'boulder', desc: 'Started CS + Statistics (graduating May 2028) and joined the $1.8M ARPA-E Correll lab and CU Quants.' },
   { year: '2026', place: 'Boulder', title: 'NSBE Torch Chair', img: 'nsbe', city: 'boulder', desc: "Torch Chair for CU Boulder's National Society of Black Engineers chapter, growing the community and pipeline for the next generation of engineers." },
   { year: '2026', place: 'Boulder', title: 'AutoGrasp + Humanoid Sim', img: 'autograsp', city: 'boulder', desc: 'A UR5e that collects and grades its own grasp data, reaching a 97/100 policy with zero human labels, plus humanoid simulation work (HAMS) that fed the GOLEM paper. AutoGrasp paper in progress.' },
-  { year: '2027', place: 'Next', title: 'The dream internship', img: 'goal', city: 'boulder', desc: 'To be determined 👀' },
+  { year: '2027', place: 'Next', title: 'The dream internship', img: '', ph: 'next stop: loading', city: 'boulder', desc: 'To be determined 👀' },
 ]
 
 function JourneyTimeline() {
@@ -89,7 +93,7 @@ function JourneyTimeline() {
               <h3>{m.title}</h3>
               <p>{m.desc}</p>
             </div>
-            <Img src={`./images/${m.img}.jpg`} alt={m.title} hint={`images/${m.img}.jpg`} className="node-img" />
+            <Img src={m.img ? `./images/${m.img}.jpg` : ''} alt={m.title} fit={m.fit} bg={m.bg} ph={m.ph} className="node-img" />
           </div>
         </div>
       ))}
@@ -233,7 +237,7 @@ function Home() {
         <div className="brand"><div className="mono-badge">AA</div><span>Adam Abid</span></div>
         <div className="navlinks">
           <a href="#about">About</a><a href="#journey">Journey</a><a href="#experience">Experience</a>
-          <a href="#projects">Projects</a><a href="#fun">Life</a><a href="#articles">Articles</a>
+          <a href="#projects">Projects</a><a href="#fun">Life</a>{SHOW_WRITING && <a href="#articles">Articles</a>}
           <a className="btn-solid" href={RESUME} target="_blank" rel="noreferrer">Résumé</a>
         </div>
       </nav>
@@ -334,6 +338,7 @@ function Home() {
               <div className="chips"><span>Next.js 16</span><span>React 19</span><span>TypeScript</span><span>Three.js / R3F</span><span>GSAP ScrollTrigger</span></div>
             </div>
             <div className="xcard">
+              <div className="imgbox xcard-img xcard-band" aria-hidden="true"><RobotSVG /></div>
               <div className="top"><div><h3>Campos Student Center · CU Boulder</h3><div className="role">Community and Scholarship Assistant</div></div><div className="when">2026–now</div></div>
               <p>Mentoring first-year BOLD Scholars one-on-one with resource referrals as they start at CU Boulder, co-planning community events with Campos staff, and managing participation and quiz data for program staff.</p>
               <div className="metrics"><Metric v="4" suf="+" label="events" /><Metric v="100" suf="+" label="students reached" /><Metric v="80" suf="+" label="students tracked" /></div>
@@ -489,12 +494,14 @@ function Home() {
       </section>
 
       {/* ARTICLES */}
+      {SHOW_WRITING && (
       <section id="articles" className="pad" style={{ background: 'var(--ink2)' }}>
         <div className="wrap">
           <div className="shead"><span className="num">06</span><h2>Writing</h2></div>
           <div className="art-empty">Your LinkedIn articles + a markdown blog land here. Send me the links and I'll wire up the cards.</div>
         </div>
       </section>
+      )}
 
       {/* FOOTER */}
       <footer>
